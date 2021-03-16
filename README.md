@@ -1,8 +1,6 @@
-## pm\_rlua
+## AW
 
-This library is a high-level binding for Lua 5.3. You don't have access to the Lua stack, all you can do is read/write variables (including callbacks) and execute Lua code.
-
-[![Build Status](https://api.travis-ci.org/perdumonocle/pm_rlua.svg?branch=master)](https://travis-ci.org/perdumonocle/pm_rlua)
+The AW library is a high-level binding for Lua 5.3. You don't have access to the Lua stack, all you can do is read/write variables (including callbacks) and execute Lua code.
 
 ### How to install it?
 
@@ -10,13 +8,13 @@ Add this to the `Cargo.toml` file of your project
 
 ```toml
 [dependencies]
-pm_rlua = "0.1.0"
+aw = "0.1.0"
 ```
 
 ### How to use it?
 
 ```rust
-use pm_rlua::Lua;
+use aw::Lua;
 ```
 
 The `Lua` struct is the main element of this library. It represents a context in which you can execute Lua code.
@@ -51,14 +49,14 @@ The `exec_string` function takes a `&str` and returns a `Option<T>` where `T: Lu
 
 #### Writing functions
 
-In order to write a function, you must wrap it around `pm_rlua::functionX` where `X` is the number of parameters. This is for the moment a limitation of Rust's inferrence system.
+In order to write a function, you must wrap it around `aw::functionX` where `X` is the number of parameters. This is for the moment a limitation of Rust's inferrence system.
 
 ```rust
 fn add(a: i32, b: i32) -> i32 {
     a + b
 }
 
-lua.set("add", pm_rlua::function2(add));
+lua.set("add", aw::function2(add));
 let _: () = lua.exec_string("c = add(2, 4)").unwrap();   // calls the `add` function above
 let c: i32 = lua.query("c").unwrap();
 assert_eq!(c, 6);
@@ -69,7 +67,7 @@ In Lua, functions are exactly like regular variables.
 You can write regular functions as well as closures:
 
 ```rust
-lua.set("mul", pm_rlua::function2(|a: i32, b: i32| a * b));
+lua.set("mul", aw::function2(|a: i32, b: i32| a * b));
 ```
 
 Note that the lifetime of the Lua context must be equal to or shorter than the lifetime of closures. This is enforced at compile-time.
@@ -150,14 +148,14 @@ struct Foo {
     a : i32,
 };
 
-impl<'a> pm_rlua::LuaPush for &'a mut  Foo {
+impl<'a> aw::LuaPush for &'a mut  Foo {
     fn push_to_lua(self, lua: *mut c_lua::lua_State) -> i32 {
-        pm_rlua::userdata::push_userdata(self, lua, |_|{})
+        aw::userdata::push_userdata(self, lua, |_|{})
     }
 }
-impl<'a> pm_rlua::LuaRead for &'a mut  Foo {
+impl<'a> aw::LuaRead for &'a mut  Foo {
     fn lua_read_at_position(lua: *mut c_lua::lua_State, index: i32) -> Option<&'a mut Foo> {
-        pm_rlua::userdata::read_userdata(lua, index)
+        aw::userdata::read_userdata(lua, index)
     }
 }
 
@@ -174,9 +172,9 @@ assert!(get.a == 100);
 ```
 use lightuserdata you can change
 ```rust
-impl<'a> pm_rlua::LuaPush for &'a mut  Foo {
+impl<'a> aw::LuaPush for &'a mut  Foo {
     fn push_to_lua(self, lua: *mut c_lua::lua_State) -> i32 {
-        pm_rlua::userdata::push_lightuserdata(self, lua, |_|{})
+        aw::userdata::push_lightuserdata(self, lua, |_|{})
     }
 }
 ```
@@ -203,7 +201,7 @@ impl NewStruct for TestLuaSturct {
 
 impl<'a> LuaRead for &'a mut TestLuaSturct {
     fn lua_read_at_position(lua: *mut c_lua::lua_State, index: i32) -> Option<&'a mut TestLuaSturct> {
-        pm_rlua::userdata::read_userdata(lua, index)
+        aw::userdata::read_userdata(lua, index)
     }
 }
 ```
@@ -216,8 +214,8 @@ lua.openlibs();
 fn one_arg(obj : &mut TestLuaSturct) -> i32 { obj.index = 10; 5 };
 fn two_arg(obj : &mut TestLuaSturct, index : i32) { obj.index = index;};
 
-let mut value = pm_rlua::LuaStruct::<TestLuaSturct>::new(lua.state());
-value.create().def("one_arg", pm_rlua::function1(one_arg)).def("two_arg", pm_rlua::function2(two_arg));
+let mut value = aw::LuaStruct::<TestLuaSturct>::new(lua.state());
+value.create().def("one_arg", aw::function1(one_arg)).def("two_arg", aw::function2(two_arg));
 
 let _ : Option<()> = lua.exec_string("x = TestLuaSturct()");
 let val : Option<i32> = lua.exec_string("return x:one_arg()");

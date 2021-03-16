@@ -1,8 +1,8 @@
 extern crate libc;
-extern crate pm_rlua;
+extern crate aw;
 
-use pm_rlua::Lua;
-use pm_rlua::LuaTable;
+use aw::Lua;
+use aw::LuaTable;
 
 #[test]
 fn basic() {
@@ -14,7 +14,7 @@ fn basic() {
 #[test]
 fn syntax_error() {
     let mut lua = Lua::new();
-    let val: Option<()> = lua.exec_string("pm_rlua");
+    let val: Option<()> = lua.exec_string("aw");
     assert!(val.is_none());
 }
 
@@ -43,7 +43,7 @@ fn simple_function() {
     fn ret5() -> i32 {
         5
     };
-    lua.set("ret5", pm_rlua::function0(ret5));
+    lua.set("ret5", aw::function0(ret5));
 
     let val: i32 = lua.exec_string("return ret5()").unwrap();
     assert_eq!(val, 5);
@@ -56,7 +56,7 @@ fn one_argument() {
     fn plus_one(val: i32) -> i32 {
         val + 1
     };
-    lua.set("plus_one", pm_rlua::function1(plus_one));
+    lua.set("plus_one", aw::function1(plus_one));
 
     let val: i32 = lua.exec_string("return plus_one(3)").unwrap();
     assert_eq!(val, 4);
@@ -69,7 +69,7 @@ fn two_arguments() {
     fn add(val1: i32, val2: i32) -> i32 {
         val1 + val2
     };
-    lua.set("add", pm_rlua::function2(add));
+    lua.set("add", aw::function2(add));
 
     let val: i32 = lua.exec_string("return add(3, 7)").unwrap();
     assert_eq!(val, 10);
@@ -82,7 +82,7 @@ fn wrong_arguments_types() {
     fn add(val1: i32, val2: i32) -> i32 {
         val1 + val2
     };
-    lua.set("add", pm_rlua::function2(add));
+    lua.set("add", aw::function2(add));
     let val: Option<i32> = lua.exec_string("return add(3, \"hello\")");
     match val {
         None => (),
@@ -94,8 +94,8 @@ fn wrong_arguments_types() {
 fn closures() {
     let mut lua = Lua::new();
 
-    lua.set("add", pm_rlua::function2(|a: i32, b: i32| a + b));
-    lua.set("sub", pm_rlua::function2(|a: i32, b: i32| a - b));
+    lua.set("add", aw::function2(|a: i32, b: i32| a + b));
+    lua.set("sub", aw::function2(|a: i32, b: i32| a - b));
 
     let val1: i32 = lua.exec_string("return add(3, 7)").unwrap();
     assert_eq!(val1, 10);
@@ -112,7 +112,7 @@ fn closures_lifetime() {
     {
         let mut lua = Lua::new();
 
-        lua.set("add", pm_rlua::function2(f));
+        lua.set("add", aw::function2(f));
 
         let val1: i32 = lua.exec_string("return add(3, 7)").unwrap();
         assert_eq!(val1, 10);
@@ -128,7 +128,7 @@ fn closures_extern_access() {
     {
         let mut lua = Lua::new();
 
-        lua.set("inc", pm_rlua::function0(|| a += 1));
+        lua.set("inc", aw::function0(|| a += 1));
         for _ in 0..15 {
             let _: () = lua.exec_string("inc()").unwrap();
         }
@@ -142,7 +142,7 @@ fn test_exec_func() {
     let mut lua = Lua::new();
     {
         let mut index = 5;
-        lua.set("add", pm_rlua::function1(|a: i32| index += a));
+        lua.set("add", aw::function1(|a: i32| index += a));
         let success: i32 = lua.exec_func1("add", 3);
         assert!(success == 0);
         assert_eq!(index, 8);
@@ -151,7 +151,7 @@ fn test_exec_func() {
         let mut index = 5;
         lua.set(
             "sub",
-            pm_rlua::function3(|a: i32, b: u32, _c: String| index -= a + b as i32),
+            aw::function3(|a: i32, b: u32, _c: String| index -= a + b as i32),
         );
         let success: i32 = lua.exec_func3("sub", 3, 1, "".to_string());
         assert!(success == 0);
@@ -178,7 +178,7 @@ fn test_exec_func_by_param() {
         end
     ";
 
-    extern "C" fn test_rust(lua: *mut pm_rlua::lua_State) -> libc::c_int {
+    extern "C" fn test_rust(lua: *mut aw::lua_State) -> libc::c_int {
         let mut lua_ob = Lua::from_existing_state(lua, false);
         let _: Option<()> = lua_ob.exec_func("test2");
         1

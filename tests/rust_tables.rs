@@ -1,6 +1,6 @@
-extern crate pm_rlua;
+extern crate aw;
 
-use pm_rlua::{Lua, LuaTable};
+use aw::{Lua, LuaTable};
 use std::collections::{HashMap, HashSet};
 
 #[test]

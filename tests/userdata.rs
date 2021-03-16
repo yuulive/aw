@@ -1,10 +1,10 @@
-extern crate pm_rlua;
+extern crate aw;
 
-use pm_rlua::lua_State;
-use pm_rlua::Lua;
-use pm_rlua::LuaPush;
-use pm_rlua::LuaRead;
-use pm_rlua::NewStruct;
+use aw::lua_State;
+use aw::Lua;
+use aw::LuaPush;
+use aw::LuaRead;
+use aw::NewStruct;
 
 #[test]
 fn readwrite() {
@@ -12,12 +12,12 @@ fn readwrite() {
     struct Foo;
     impl<'a> LuaPush for Foo {
         fn push_to_lua(self, lua: *mut lua_State) -> i32 {
-            pm_rlua::userdata::push_userdata(self, lua, |_| {})
+            aw::userdata::push_userdata(self, lua, |_| {})
         }
     }
     impl<'a> LuaRead for &'a mut Foo {
         fn lua_read_with_pop(lua: *mut lua_State, index: i32, _pop: i32) -> Option<&'a mut Foo> {
-            pm_rlua::userdata::read_userdata(lua, index)
+            aw::userdata::read_userdata(lua, index)
         }
     }
 
@@ -46,7 +46,7 @@ fn destructor_called() {
 
     impl<'a> LuaPush for Foo {
         fn push_to_lua(self, lua: *mut lua_State) -> i32 {
-            pm_rlua::userdata::push_userdata(self, lua, |_| {})
+            aw::userdata::push_userdata(self, lua, |_| {})
         }
     }
 
@@ -70,12 +70,12 @@ fn type_check() {
     struct Foo;
     impl<'a> LuaPush for Foo {
         fn push_to_lua(self, lua: *mut lua_State) -> i32 {
-            pm_rlua::userdata::push_userdata(self, lua, |_| {})
+            aw::userdata::push_userdata(self, lua, |_| {})
         }
     }
     impl<'a> LuaRead for &'a mut Foo {
         fn lua_read_with_pop(lua: *mut lua_State, index: i32, _pop: i32) -> Option<&'a mut Foo> {
-            pm_rlua::userdata::read_userdata(lua, index)
+            aw::userdata::read_userdata(lua, index)
         }
     }
 
@@ -83,12 +83,12 @@ fn type_check() {
     struct Bar;
     impl<'a> LuaPush for Bar {
         fn push_to_lua(self, lua: *mut lua_State) -> i32 {
-            pm_rlua::userdata::push_userdata(self, lua, |_| {})
+            aw::userdata::push_userdata(self, lua, |_| {})
         }
     }
     impl<'a> LuaRead for &'a mut Bar {
         fn lua_read_with_pop(lua: *mut lua_State, index: i32, _pop: i32) -> Option<&'a mut Bar> {
-            pm_rlua::userdata::read_userdata(lua, index)
+            aw::userdata::read_userdata(lua, index)
         }
     }
 
@@ -106,12 +106,12 @@ fn metatables() {
     struct Foo;
     impl<'a> LuaPush for Foo {
         fn push_to_lua(self, lua: *mut lua_State) -> i32 {
-            pm_rlua::userdata::push_userdata(self, lua, |mut table| {
+            aw::userdata::push_userdata(self, lua, |mut table| {
                 table.set(
                     "__index".to_string(),
                     vec![
-                        // ("test".to_string(), pm_rlua::function0(|| 5)),
-                        ("test1".to_string(), pm_rlua::function1(|a: i32| a)),
+                        // ("test".to_string(), aw::function0(|| 5)),
+                        ("test1".to_string(), aw::function1(|a: i32| a)),
                     ],
                 );
             })
@@ -134,14 +134,14 @@ fn get_set_test() {
         a: i32,
     };
 
-    impl<'a> pm_rlua::LuaPush for Foo {
+    impl<'a> aw::LuaPush for Foo {
         fn push_to_lua(self, lua: *mut lua_State) -> i32 {
-            pm_rlua::userdata::push_userdata(self, lua, |_| {})
+            aw::userdata::push_userdata(self, lua, |_| {})
         }
     }
-    impl<'a> pm_rlua::LuaRead for &'a mut Foo {
+    impl<'a> aw::LuaRead for &'a mut Foo {
         fn lua_read_with_pop(lua: *mut lua_State, index: i32, _pop: i32) -> Option<&'a mut Foo> {
-            pm_rlua::userdata::read_userdata(lua, index)
+            aw::userdata::read_userdata(lua, index)
         }
     }
 
@@ -185,7 +185,7 @@ fn custom_struct() {
             index: i32,
             _pop: i32,
         ) -> Option<&'a mut TestLuaSturct> {
-            pm_rlua::userdata::read_userdata(lua, index)
+            aw::userdata::read_userdata(lua, index)
         }
     }
 
@@ -199,11 +199,11 @@ fn custom_struct() {
         obj.index = index;
     };
 
-    let mut value = pm_rlua::LuaStruct::<TestLuaSturct>::new(lua.state());
+    let mut value = aw::LuaStruct::<TestLuaSturct>::new(lua.state());
     value
         .create()
-        .def("one_arg", pm_rlua::function1(one_arg))
-        .def("two_arg", pm_rlua::function2(two_arg));
+        .def("one_arg", aw::function1(one_arg))
+        .def("two_arg", aw::function2(two_arg));
 
     let _: Option<()> = lua.exec_string("x = TestLuaSturct()");
     let val: Option<i32> = lua.exec_string("return x:one_arg()");

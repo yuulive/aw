@@ -1,6 +1,6 @@
-extern crate pm_rlua;
+extern crate aw;
 
-use pm_rlua::{Lua, LuaTable};
+use aw::{Lua, LuaTable};
 
 #[test]
 fn iterable() {
@@ -93,7 +93,7 @@ fn metatable() {
         fn handler() -> i32 {
             5
         };
-        metatable.set("__add".to_string(), pm_rlua::function0(handler));
+        metatable.set("__add".to_string(), aw::function0(handler));
     }
 
     let r: i32 = lua.exec_string("return a + a").unwrap();

@@ -1,9 +1,9 @@
 [package]
-name = "pm_rlua"
+name = "aw"
 version = "0.1.0"
 authors = [ "tickbh <tickdream125@hotmail.com>", "Захаров Константин Иванович <konstantin_1987@mail.ru>" ]
-description = "Zero-cost high-level lua 5.3 wrapper for Rust. Some fixes for td_rlua."
-repository = "https://github.com/perdumonocle/pm_rlua"
+description = "AW (A Wrapper) is a zero-cost high-level lua 5.3 wrapper for Rust. Some fixes for td_rlua."
+repository = "https://github.com/yuulive/aw"
 license = "MIT/Apache-2.0"
 keywords = ["lua", "wrapper"]
 

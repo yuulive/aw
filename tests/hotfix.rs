@@ -1,6 +1,6 @@
-extern crate pm_rlua;
+extern crate aw;
 
-use pm_rlua::Lua;
+use aw::Lua;
 
 #[test]
 fn hotfix_table() {
